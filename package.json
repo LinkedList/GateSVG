@@ -1,0 +1,9 @@
+{
+  "description": "Gate svg proxy server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "latest",
+    "request": "latest"
+  }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SVG</title>
+
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.css">
+
+    <script id="pointInfoTemplate" type="text/template">
+        <div style="font-weight: bold">Closest named object distance (must be less then 100): <%= distance %></div>
+        <div style="font-weight: bold">Closest named object ID: <%= id %></div>
+    </script>
+  </head>
+
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Gate SVG</a>
+          <div id="header" class="brand"></div>
+          <div class="nav-collapse collapse">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+        <div id="svg"></div>
+        <div id="info"></div>
+    </div>    
+
+    <script src="js/kdTree.js"></script>
+    <script src="js/libs/jquery.js"></script>
+    <script src="js/libs/underscore.js"></script>
+    <script src="js/libs/backbone.js"></script>
+    <script src="js/libs/bootstrap.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/views.js"></script>
+    <script src="js/collections.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
