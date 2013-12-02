@@ -63,12 +63,7 @@ App.Models.Svg = Backbone.Model.extend({
                                 namedIndividuals.push(new App.Models.NamedIndividual(object));
                             }
                         });
-                    } 
-
-                    //Header for the page
-                    // if ($(this).attr("rdf:about") == "GATE_GRAPHICAL_CONTENT") {
-                    //     new App.Views.Header({text: $(this).children(":first-child").text().slice(0, -1)});
-                    // }
+                    }
                 });
                 thisSvg.set('svg', xml.documentElement);
 
@@ -78,12 +73,19 @@ App.Models.Svg = Backbone.Model.extend({
                 //add identifier to points
                 points.each(function (point) {
                     id = namedIndividuals.where({locationPoint: point.get("about")});
+                    //only one identifier should be found, if not, take the first
                     point.set("id", id[0].get("about"));
                     point.recalculate(image_size_width, image_size_height);
                 });
 
                 //Create new kdTree
                 tree = new kdTree(points.toJSON(), distance, ["x", "y"] );
+
+                //upload svg to server and get a session_id
+                $.get('/upload', function (data) {
+                    App.session_id = data;
+                    console.log(App.session_id);
+                });
 
                 //fire svgLoadDone event
                 thisSvg.trigger('svgLoadDone');

@@ -5,11 +5,18 @@ App.Views = App.Views || {};
 //Point Info View
 App.Views.PointInfo = Backbone.View.extend({
     el: "#info",
+
+    events: {
+        "click #label": "showLabel"
+    },
     
     render:function() {
         var template = _.template($("#pointInfoTemplate").html(), this.model.toJSON());
         this.$el.html(template);
         return this;
+    },
+
+    showLabel: function () {
     }
 });
 
