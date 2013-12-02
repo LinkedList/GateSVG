@@ -9,7 +9,7 @@ App.Views.PointInfo = Backbone.View.extend({
     events: {
         "click #labelButton": "showLabel",
         "click #classesButton": "showClasses",
-        "click #positionInfo": "showPositionInfo"
+        "click #positionInfoButton": "showPositionInfo"
     },
 
     render:function() {
@@ -42,6 +42,23 @@ App.Views.PointInfo = Backbone.View.extend({
             }, function (data) {
                 data.template = "#classesTemplate";
                 App.vent.trigger("ontology_info", data);
+            });
+        }
+    },
+
+    showPositionInfo: function (e) {
+        e.preventDefault();
+
+        if(this.model.get("id") !== "") {
+            $.post("/simple", {
+                uri: this.model.get("id"),
+                lod: 7
+            }, function (data) {
+                var position = {};
+                position.template = "#positionInfoTemplate";
+                position.data = data;
+
+                App.vent.trigger("ontology_info", position);
             });
         }
     }

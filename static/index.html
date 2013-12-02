@@ -17,7 +17,7 @@
         <div style="font-weight: bold">Closest named object ID: <%= id %></div>
         <a class='btn' id="labelButton" href="#">Label</a>
         <a class='btn' id="classesButton" href="#">Classes</a>
-        <a class='btn' id="positionButton" href="#">Position</a>
+        <a class='btn' id="positionInfoButton" href="#">Position</a>
     </script>
 
     <script id="labelTemplate" type="text/template">
@@ -33,6 +33,18 @@
         %>
       </ul>
     </script>
+
+    <script id="positionInfoTemplate" type="text/template">
+      <h5>Position Info</h5>
+      <ul>
+        <% _.each(_.keys(data), function(key) {
+          %> <li><%= key %>: <%= data[key] %></li> <%
+        });
+         %>
+      </ul>
+
+    </script>
+
   </head>
 
   <body>
