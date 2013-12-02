@@ -15,6 +15,22 @@
     <script id="pointInfoTemplate" type="text/template">
         <div style="font-weight: bold">Closest named object distance (must be less then 100): <%= distance %></div>
         <div style="font-weight: bold">Closest named object ID: <%= id %></div>
+        <a class='btn' id="labelButton" href="#">Label</a>
+        <a class='btn' id="classesButton" href="#">Classes</a>
+        <a class='btn' id="positionButton" href="#">Position</a>
+    </script>
+
+    <script id="labelTemplate" type="text/template">
+        <div style="font-weight: bold">Object label: <%= label %></div>
+    </script>
+
+    <script id="classesTemplate" type="text/template">
+      <ul>
+        <% _each(classes, function (class_name) {
+            %> <li><%= class_name %> </li> <%
+          }); 
+        %>
+      </ul>
     </script>
   </head>
 
@@ -31,7 +47,10 @@
     </div>
     <div class="container">
         <div id="svg"></div>
-        <div id="info"></div>
+        <div class="row-fluid">
+          <div id="info" class="span6"></div>
+          <div id="ontology_info" class="span6"></div>
+        </div>
     </div>    
 
     <script src="js/kdTree.js"></script>
@@ -40,6 +59,7 @@
     <script src="js/libs/backbone.js"></script>
     <script src="js/libs/bootstrap.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/eventAggregator.js"></script>
     <script src="js/models.js"></script>
     <script src="js/views.js"></script>
     <script src="js/collections.js"></script>

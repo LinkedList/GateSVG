@@ -12,22 +12,24 @@
         return _.template($('#' + id).html());
     };
 
+    
+
     var svgModel = new App.Models.Svg({svgToLoad:"elephants.svg"});
     var svgView = new App.Views.Svg({model: svgModel});
 
     //close server session before quiting
-    $(window).unload(function () {
-        if(typeof App.session_id !== "undefined") {
-            $.ajax({
-                type: "POST", 
-                async: false,
-                url: "/close",
-                data: {
-                    session_id: App.session_id    
-                }
-            })
-            return "Closed session.";
-        }
-    })
-
+    // $(window).unload(function () {
+    //     if(typeof App.session_id !== "undefined") {
+    //         $.ajax({
+    //             type: "POST", 
+    //             async: false,
+    //             url: "/close",
+    //             data: {
+    //                 session_id: App.session_id    
+    //             }
+    //         })
+    //         return "Closed session.";
+    //     }
+    // })
+    
 })();

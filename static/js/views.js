@@ -7,16 +7,29 @@ App.Views.PointInfo = Backbone.View.extend({
     el: "#info",
 
     events: {
-        "click #label": "showLabel"
+        "click #labelButton": "showLabel",
+        "click #classes": "showClasses",
+        "click #positionInfo": "showPositionInfo"
     },
-    
+
     render:function() {
         var template = _.template($("#pointInfoTemplate").html(), this.model.toJSON());
         this.$el.html(template);
         return this;
     },
 
-    showLabel: function () {
+    showLabel: function (e) {
+        e.preventDefault();
+
+        if(this.model.get("id") !== "") {
+            $.post("/simple", {
+                uri: this.model.get("id"),
+                lod: 1
+            }, function (data) {
+                data.template = "#labelTemplate"
+                App.vent.trigger("ontology_info", data);
+            });
+        }
     }
 });
 
@@ -47,22 +60,19 @@ App.Views.Svg = Backbone.View.extend({
             var nearestDistance = nearest[0][1];
             
 
+
             //Distance must be less than 100 for now
             if(nearestDistance > 100) {
-                new App.Views.PointInfo({
-                    model: new App.Models.PointInfo({
-                        distance:nearestDistance.toFixed(2), 
-                        id: " "
-                    })
-                }).render();
+                App.vent.trigger("point_info", {
+                    distance:nearestDistance.toFixed(2),
+                    id: ""
+                });
             } else {
                 //Put information about NamedIndividual on page
-                var pointInfo = new App.Models.PointInfo({   
+                App.vent.trigger("point_info", {   
                         distance: nearestDistance.toFixed(2),
                         id: nearestNamedPoint.id
                     });
-                new App.Views.PointInfo({model: pointInfo}).render();
-                
             }
     	}
     }
@@ -81,3 +91,13 @@ App.Views.Header = Backbone.View.extend({
 		return this;
 	}
 });
+
+App.Views.OntologyInfo = Backbone.View.extend({
+    el: "#ontology_info",
+
+    render: function () {
+        var template = _.template($(this.template).html(), this.model.toJSON());
+        this.$el.html(template);
+        return this;
+    }
+})

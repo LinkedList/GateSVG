@@ -82,9 +82,14 @@ App.Models.Svg = Backbone.Model.extend({
                 tree = new kdTree(points.toJSON(), distance, ["x", "y"] );
 
                 //upload svg to server and get a session_id
-                $.get('/upload', function (data) {
-                    App.session_id = data;
-                    console.log(App.session_id);
+                // $.get('/upload', function (data) {
+                //     App.session_id = data;
+                //     console.log(App.session_id);
+                // });
+
+                //language to english
+                $.post('/language', {
+                    language: 'en'
                 });
 
                 //fire svgLoadDone event
@@ -95,4 +100,7 @@ App.Models.Svg = Backbone.Model.extend({
 });
 
 App.Models.PointInfo = Backbone.Model.extend({
+});
+
+App.Models.OntologyInfo = Backbone.Model.extend({
 });

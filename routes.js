@@ -1,7 +1,7 @@
 var request = require('request');
 
 module.exports = function (app) {
-
+	var session_id = "a2f243e2-3b5e-4215-b1d8-3e1e34b19806";
 	var HTTP_400_BAD_REQUEST = 400;
 	var gate_server = "http://virtual-126.fi.muni.cz:8080/GateWS";
 	var svg_uri = "https://is.muni.cz/www/324899/elephants.svg";
@@ -18,20 +18,22 @@ module.exports = function (app) {
 				return;
 			}
 
+			console.log("Finished uploading svg..");
+
 			res.send(body);
 		});
 	});
 
 	app.get('/annotation', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = '/svg/get-annotation/' + req.body.session_id;
+		var path = '/svg/get-annotation/' + session_id;
 
 		console.log("Getting annotation..");
-		console.log("Session_id: " + req.body.session_id);
+		console.log("Session_id: " + session_id);
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
 				res.send(error);
@@ -43,15 +45,15 @@ module.exports = function (app) {
 	});
 
 	app.get('/svg', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = '/svg/get/' + req.body.session_id;
+		var path = '/svg/get/' + session_id;
 
 		console.log("Getting svg..");
-		console.log("Session_id: " + req.body.session_id);
+		console.log("Session_id: " + session_id);
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
@@ -64,15 +66,15 @@ module.exports = function (app) {
 	});
 
 	app.post('/close', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = "/svg/close/" + req.body.session_id;
+		var path = "/svg/close/" + session_id;
 
 		console.log("Closing session.. ");
-		console.log("Session_id: " + + req.body.session_id);
+		console.log("Session_id: " + session_id);
 
 		request.post(gate_server + path, function (error, response, body) {
 			if(error) {
@@ -87,7 +89,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/language', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -97,10 +99,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/set-language/" + req.body.session_id + "?lang=" + req.body.language;
+		var path = "/owl/set-language/" + session_id + "?lang=" + req.body.language;
 
 		console.log("Setting language..");
-		console.log("Session_id: " + req.body.session_id);
+		console.log("Session_id: " + session_id);
 		console.log("Language: " + req.body.language);
 
 		request(gate_server + path, function (error, response, body) {
@@ -114,7 +116,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/identify', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -124,10 +126,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/identify-subject/" + req.body.session_id + "?subjectName=" + req.body.subjectName;
+		var path = "/owl/identify-subject/" + session_id + "?subjectName=" + req.body.subjectName;
 
 		console.log("Identifying subject..");
-		console.log("Session_id: " + req.body.session_id);
+		console.log("Session_id: " + session_id);
 		console.log("SubjectName: " + req.body.subjectName);
 
 		request(gate_server + path, function (error, response, body) {
@@ -142,7 +144,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/simple', function (req, res) {
-		if(typeof req.body.session_id === "undefined") {
+		if(typeof session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -157,10 +159,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/query-subject/simple/" + req.body.session_id + "?uri=" + req.body.uri + "&lod=" + req.body.lod;
+		var path = "/owl/query-subject/simple/" + session_id + "?uri=" + req.body.uri + "&lod=" + req.body.lod;
 
 		console.log("Querying simple..");
-		console.log("Session_id: " + req.body.session_id);
+		console.log("Session_id: " + session_id);
 		console.log("Uri: " + req.body.uri);
 		console.log("Lod: " + req.body.lod);
 
