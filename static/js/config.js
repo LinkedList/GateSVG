@@ -1,5 +1,5 @@
 //base url for images - will be loaded from here
-var baseUrl = "http://localhost:3000/images/";
+var baseUrl = "/images/";
 
 //tree variable - must be global on page
 var tree;
