@@ -25,8 +25,9 @@
     </script>
 
     <script id="classesTemplate" type="text/template">
+      <h5>Classes</h5>
       <ul>
-        <% _each(classes, function (class_name) {
+        <% _.each(classes, function (class_name) {
             %> <li><%= class_name %> </li> <%
           }); 
         %>

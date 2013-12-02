@@ -8,7 +8,7 @@ App.Views.PointInfo = Backbone.View.extend({
 
     events: {
         "click #labelButton": "showLabel",
-        "click #classes": "showClasses",
+        "click #classesButton": "showClasses",
         "click #positionInfo": "showPositionInfo"
     },
 
@@ -26,7 +26,21 @@ App.Views.PointInfo = Backbone.View.extend({
                 uri: this.model.get("id"),
                 lod: 1
             }, function (data) {
-                data.template = "#labelTemplate"
+                data.template = "#labelTemplate";
+                App.vent.trigger("ontology_info", data);
+            });
+        }
+    },
+
+    showClasses: function (e) {
+        e.preventDefault();
+
+        if(this.model.get("id") !== "") {
+            $.post("/simple", {
+                uri: this.model.get("id"), 
+                lod: 4
+            }, function (data) {
+                data.template = "#classesTemplate";
                 App.vent.trigger("ontology_info", data);
             });
         }
