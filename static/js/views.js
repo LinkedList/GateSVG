@@ -4,63 +4,85 @@ App.Views = App.Views || {};
 
 //Point Info View
 App.Views.PointInfo = Backbone.View.extend({
-    el: "#info",
+    className: "point-info",
 
     events: {
-        "click #labelButton": "showLabel",
-        "click #classesButton": "showClasses",
-        "click #positionInfoButton": "showPositionInfo"
+        "click .close": "close",
+        "click .point-link": "pointLink"
+    },
+
+    initialize: function () {
+        this.model.bind("change", this.render, this);
+        var labelDone = this.showLabel();
+        labelDone.promise().done($.proxy(function () {
+            var classesDone = this.showClasses();
+
+            classesDone.promise().done($.proxy(this.showPositionInfo, this));
+        }, this));
     },
 
     render:function() {
         var template = _.template($("#pointInfoTemplate").html(), this.model.toJSON());
+        this.$el.css({
+            "position": "absolute",
+            "top": this.model.get("top") + "px",
+            "left": this.model.get("left") + "px"
+        });
         this.$el.html(template);
+        $("body").append(this.$el);
         return this;
     },
 
-    showLabel: function (e) {
-        e.preventDefault();
+    showLabel: function () {
+        var _model = this.model;
 
         if(this.model.get("id") !== "") {
-            $.post("/simple", {
+            return $.post("/simple", {
                 uri: this.model.get("id"),
                 lod: 1
             }, function (data) {
-                data.template = "#labelTemplate";
-                App.vent.trigger("ontology_info", data);
+                _model.set("label", data.label);
             });
         }
     },
 
-    showClasses: function (e) {
-        e.preventDefault();
+    showClasses: function () {
+        var _model = this.model;
 
         if(this.model.get("id") !== "") {
-            $.post("/simple", {
+            return $.post("/simple", {
                 uri: this.model.get("id"), 
                 lod: 4
             }, function (data) {
-                data.template = "#classesTemplate";
-                App.vent.trigger("ontology_info", data);
+                _model.set("classes", data.classes);
             });
         }
     },
 
-    showPositionInfo: function (e) {
-        e.preventDefault();
+    showPositionInfo: function () {
+        var _model = this.model;
 
         if(this.model.get("id") !== "") {
-            $.post("/simple", {
+            return $.post("/simple", {
                 uri: this.model.get("id"),
                 lod: 7
             }, function (data) {
-                var position = {};
-                position.template = "#positionInfoTemplate";
-                position.data = data;
-
-                App.vent.trigger("ontology_info", position);
+                _model.set("position", data);
             });
         }
+    },
+
+    pointLink: function (event) {
+        event.preventDefault();
+        var id = $(event.target).html().toLowerCase();
+        App.vent.trigger("point_link", {
+            id: id
+        });
+    },
+
+    close: function (event) {
+        event.preventDefault();
+        this.remove();
     }
 });
 
@@ -84,30 +106,78 @@ App.Views.Svg = Backbone.View.extend({
 
     clicked: function(event) {
     	if(event.target.nodeName == "image") {
+
     		var point = new App.Models.Point({x:event.offsetX, y:event.offsetY});
 
     		var nearest = tree.nearest(point.toJSON(), 1);
             var nearestNamedPoint = nearest[0][0];
             var nearestDistance = nearest[0][1];
-            
-
 
             //Distance must be less than 100 for now
             if(nearestDistance > 100) {
                 App.vent.trigger("point_info", {
                     distance:nearestDistance.toFixed(2),
-                    id: ""
+                    id: "",
+                    top: event.clientY,
+                    left:event.clientX
                 });
             } else {
                 //Put information about NamedIndividual on page
                 App.vent.trigger("point_info", {   
                         distance: nearestDistance.toFixed(2),
-                        id: nearestNamedPoint.id
+                        id: nearestNamedPoint.id,
+                        top: event.clientY,
+                        left:event.clientX
                     });
             }
     	}
+    },
+
+    getOffset: function () {
+        return this.$el.offset();
     }
 });
+
+App.Views.ServerStatus = Backbone.View.extend({
+    el: "#server_status", 
+
+    initialize: function (model) {
+        this.model = model;
+        this.model.bind("change", this.changed, this);
+    },
+
+    changed: function () {
+        var status = this.model.get("status");
+        if(status === "NOK") {
+            this.$el.attr('title', "Server is not responding..");
+            this.$el.html("Server is not responding..");
+            this.$el.removeClass("badge-success");
+            this.$el.addClass("badge-important");
+        } else {
+            this.$el.attr('title', "Server is responding..");
+            this.$el.html("Server is responding..");
+            this.$el.removeClass("badge-important");
+            this.$el.addClass("badge-success");
+        }
+    }
+});
+
+App.Views.Language = Backbone.View.extend({
+    el: "#language_select",
+
+    events: {
+        'change': "changed"
+    },
+
+    initialize: function (model) {
+        this.model = model;
+    },
+
+    changed: function (event) {
+        var value = this.$el.val();
+        this.model.set("language", value);
+    }
+})
 
 App.Views.Header = Backbone.View.extend({
 	el: "#header",
@@ -122,13 +192,3 @@ App.Views.Header = Backbone.View.extend({
 		return this;
 	}
 });
-
-App.Views.OntologyInfo = Backbone.View.extend({
-    el: "#ontology_info",
-
-    render: function () {
-        var template = _.template($(this.template).html(), this.model.toJSON());
-        this.$el.html(template);
-        return this;
-    }
-})

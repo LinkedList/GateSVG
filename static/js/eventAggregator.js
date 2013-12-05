@@ -1,28 +1,29 @@
 window.App = window.App || {};
 App.vent = _.extend({}, Backbone.Events);
 
-App.vent.on("point_info", function (data) {
-	if(typeof App.pointInfo === "undefined") {
-		App.pointInfo = new App.Views.PointInfo({
-			model: new App.Models.PointInfo(data),
-		});	
-	}
+App.openedInfos = [];
 
-	App.pointInfo.model = new App.Models.PointInfo(data);
-	App.pointInfo.render();
+App.vent.on("point_info", function (data) {	
+	console.log(data);
+	_.each(App.openedInfos, function (opened) {
+		opened.remove();
+		App.openedInfos.pop();
+	});
+
+	var info = new App.Views.PointInfo({
+		model: new App.Models.PointInfo(data)
+	});
+	info.render();
+	App.openedInfos.push(info);
 });
 
-App.vent.on("ontology_info", function (data) {
-	var template = data.template;
-	delete data.template;
-
-	if(typeof App.ontologyInfo === "undefined") {
-		App.ontologyInfo = new App.Views.OntologyInfo({
-			model: new App.Models.OntologyInfo(data)
-		});	
-	}
-
-	App.ontologyInfo.model = new App.Models.OntologyInfo(data);
-	App.ontologyInfo.template = template;
-	App.ontologyInfo.render();
-})
+App.vent.on("point_link", function (data) {
+	var offset = App.svgView.getOffset();
+	var point = points.where({id: data.id})[0];
+	
+	App.vent.trigger("point_info", {
+		id: data.id,
+		top: offset.top + point.get("y"),
+		left: offset.left + point.get("x")
+	});
+});

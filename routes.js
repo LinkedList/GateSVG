@@ -1,10 +1,38 @@
 var request = require('request');
+var http = require('http');
 
 module.exports = function (app) {
-	var session_id = "a2f243e2-3b5e-4215-b1d8-3e1e34b19806";
+	var session_id = "9b4ba7b9-901f-4a0a-8236-44d7c9be5dec";
+
+	var HTTP_200_OK = 200;
 	var HTTP_400_BAD_REQUEST = 400;
+	var HTTP_500_INTERNAL_SERVER_ERROR = 500;
+
 	var gate_server = "http://virtual-126.fi.muni.cz:8080/GateWS";
 	var svg_uri = "https://is.muni.cz/www/324899/elephants.svg";
+
+	//test if server is reachable
+	app.get('/test', function (req, res) {
+		console.log("Testing server reachability..");
+		request({ uri: gate_server, timeout:"5000" }, function (error, response, body) {
+			if(error) {
+				console.log("Server is not reachable..");
+				console.log("Error: " + error.message);
+				res.json({
+					error: error,
+					status: "Server is not reachable"
+				});
+				return;
+			} else {
+				console.log("Serves is reachable and responding..");
+				res.json({
+					status: "Server is reachable"
+				});
+				return;
+			}
+			
+		});
+	});
 
 	//upload svg to gate server
 	app.get('/upload', function (req, res) {
@@ -14,7 +42,12 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
@@ -36,7 +69,12 @@ module.exports = function (app) {
 		console.log("Session_id: " + session_id);
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
@@ -57,7 +95,12 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
@@ -78,8 +121,12 @@ module.exports = function (app) {
 
 		request.post(gate_server + path, function (error, response, body) {
 			if(error) {
-				console.log(error);
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
@@ -107,7 +154,12 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
@@ -134,7 +186,12 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 			json = JSON.parse(body);
@@ -168,7 +225,12 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
-				res.send(error);
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
 				return;
 			}
 
