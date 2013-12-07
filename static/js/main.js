@@ -43,6 +43,9 @@
         App.languageView = new App.Views.Language(App.language);
         App.language.set("language", "en");
 
+        App.allPointsButtonView = new App.Views.AllPointsButton();
+        App.pointMarkersView = new App.Views.PointMarkers({collection: points});
+
     })
     
     //close server session before quiting

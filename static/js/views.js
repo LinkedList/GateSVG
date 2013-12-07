@@ -13,6 +13,7 @@ App.Views.PointInfo = Backbone.View.extend({
 
     initialize: function () {
         this.model.bind("change", this.render, this);
+
         var labelDone = this.showLabel();
         labelDone.promise().done($.proxy(function () {
             var classesDone = this.showClasses();
@@ -176,6 +177,56 @@ App.Views.Language = Backbone.View.extend({
     changed: function (event) {
         var value = this.$el.val();
         this.model.set("language", value);
+    }
+})
+
+App.Views.AllPointsButton = Backbone.View.extend({
+    el: "#all_points",
+
+    events: {
+        "click": "clicked"
+    },
+
+    clicked: function (event) {
+        event.preventDefault();
+        App.vent.trigger("all_points");
+    }
+});
+
+App.Views.PointMarkers = Backbone.View.extend({
+    className: "all-points",
+
+    visible: false,
+
+    toggle: function () {
+        if(this.visible) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    },
+
+    show: function () {
+        var offset = App.svgView.getOffset();
+        this.collection.each(function (point) {
+            $("<span />", {"class": "point-marker", html: '&nbsp'})
+                .css({
+                    "position": "absolute",
+                    "top": point.get("y") + offset.top,
+                    "left": point.get("x") +offset.left,
+                    "background-color": "lime",
+                    "border-radius": "50%",
+                    "width": "10px",
+                    "height": "10px"
+                })
+                .insertAfter("#svg");
+        });
+        this.visible = true;
+    },
+
+    hide: function () {
+        $(".point-marker").remove();
+        this.visible = false;
     }
 })
 

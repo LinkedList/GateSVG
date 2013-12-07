@@ -27,3 +27,7 @@ App.vent.on("point_link", function (data) {
 		left: offset.left + point.get("x")
 	});
 });
+
+App.vent.on("all_points", function () {
+	App.pointMarkersView.toggle();
+});
