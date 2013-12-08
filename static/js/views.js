@@ -7,19 +7,13 @@ App.Views.PointInfo = Backbone.View.extend({
     className: "point-info",
 
     events: {
-        "click .close": "close",
+        "click .close": "hide",
         "click .point-link": "pointLink"
     },
 
     initialize: function () {
         this.model.bind("change", this.render, this);
-
-        var labelDone = this.showLabel();
-        labelDone.promise().done($.proxy(function () {
-            var classesDone = this.showClasses();
-
-            classesDone.promise().done($.proxy(this.showPositionInfo, this));
-        }, this));
+        this.model.fetchInfo();
     },
 
     render:function() {
@@ -34,45 +28,6 @@ App.Views.PointInfo = Backbone.View.extend({
         return this;
     },
 
-    showLabel: function () {
-        var _model = this.model;
-
-        if(this.model.get("id") !== "") {
-            return $.post("/simple", {
-                uri: this.model.get("id"),
-                lod: 1
-            }, function (data) {
-                _model.set("label", data.label);
-            });
-        }
-    },
-
-    showClasses: function () {
-        var _model = this.model;
-
-        if(this.model.get("id") !== "") {
-            return $.post("/simple", {
-                uri: this.model.get("id"), 
-                lod: 4
-            }, function (data) {
-                _model.set("classes", data.classes);
-            });
-        }
-    },
-
-    showPositionInfo: function () {
-        var _model = this.model;
-
-        if(this.model.get("id") !== "") {
-            return $.post("/simple", {
-                uri: this.model.get("id"),
-                lod: 7
-            }, function (data) {
-                _model.set("position", data);
-            });
-        }
-    },
-
     pointLink: function (event) {
         event.preventDefault();
         var id = $(event.target).html().toLowerCase();
@@ -82,8 +37,21 @@ App.Views.PointInfo = Backbone.View.extend({
     },
 
     close: function (event) {
-        event.preventDefault();
+        console.log(event);
+        if(typeof event !== "undefined") {
+            event.preventDefault();    
+        }
+        this.undelegateEvents();
+        this.model.unbind();
         this.remove();
+    },
+
+    hide: function () {
+        this.$el.hide();
+    }, 
+
+    show: function () {
+        this.$el.show();
     }
 });
 
@@ -107,7 +75,6 @@ App.Views.Svg = Backbone.View.extend({
 
     clicked: function(event) {
     	if(event.target.nodeName == "image") {
-
     		var point = new App.Models.Point({x:event.offsetX, y:event.offsetY});
 
     		var nearest = tree.nearest(point.toJSON(), 1);
@@ -194,8 +161,6 @@ App.Views.AllPointsButton = Backbone.View.extend({
 });
 
 App.Views.PointMarkers = Backbone.View.extend({
-    className: "all-points",
-
     visible: false,
 
     toggle: function () {
@@ -209,6 +174,7 @@ App.Views.PointMarkers = Backbone.View.extend({
     show: function () {
         var offset = App.svgView.getOffset();
         this.collection.each(function (point) {
+            var point_id = point.get("id");
             $("<span />", {"class": "point-marker", html: '&nbsp'})
                 .css({
                     "position": "absolute",
@@ -219,7 +185,8 @@ App.Views.PointMarkers = Backbone.View.extend({
                     "width": "10px",
                     "height": "10px"
                 })
-                .insertAfter("#svg");
+                .attr("id", point_id)
+                .insertAfter("svg");
         });
         this.visible = true;
     },

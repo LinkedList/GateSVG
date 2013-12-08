@@ -101,6 +101,10 @@ App.Models.Svg = Backbone.Model.extend({
                 });
                 thisSvg.set('svg', xml.documentElement);
 
+                //Resize to acceptable size
+                thisSvg.get('svg').width.baseVal.value = 940;
+                thisSvg.get('svg').height.baseVal.value = 706;
+
                 var image_size_width = thisSvg.get('svg').width.baseVal.value;
                 var image_size_height = thisSvg.get('svg').height.baseVal.value;
 
@@ -128,6 +132,52 @@ App.Models.Svg = Backbone.Model.extend({
 });
 
 App.Models.PointInfo = Backbone.Model.extend({
+    fetchLabel: function () {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/simple", {
+                uri: this.get("id"),
+                lod: 1
+            }, function (data) {
+                _this.set("label", data.label);
+            });    
+        }
+    },
+
+    fetchClasses: function () {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/simple", {
+                uri: this.get("id"), 
+                lod: 4
+            }, function (data) {
+                _this.set("classes", data.classes);
+            });
+        }
+    },
+
+    fetchPositionInfo: function () {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/simple", {
+                uri: this.get("id"),
+                lod: 7
+            }, function (data) {
+                _this.set("position", data);
+            });
+        }
+    },
+
+    fetchInfo: function () {
+        var labelDone = this.fetchLabel();
+        labelDone.promise().done($.proxy(function () {
+            var classesDone = this.fetchClasses();
+
+            classesDone.promise().done($.proxy(this.fetchPositionInfo, this));
+        }, this));
+    }
+
+
 });
 
 App.Models.OntologyInfo = Backbone.Model.extend({
