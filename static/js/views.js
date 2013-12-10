@@ -2,7 +2,10 @@ window.App = window.App || {};
 App.Views = App.Views || {};
 
 
-//Point Info View
+// Point Info View
+// Is responsible for showing ontology info of the point
+// Listens to model change and subsequently renders new information into the DOM
+// Doesn't get removed, only hidden, so we can show old information to the user and save requests on the server
 App.Views.PointInfo = Backbone.View.extend({
     className: "point-info",
 
@@ -56,7 +59,9 @@ App.Views.PointInfo = Backbone.View.extend({
 });
 
 
-//Svg View
+// Main SVG view
+// Gets rendered after the SVG is fully loaded and points are created in the model
+// Listens to click event, on the image, finds the nearest object and show Point info accordingly
 App.Views.Svg = Backbone.View.extend({
 	el: "#svg",
 
@@ -79,24 +84,17 @@ App.Views.Svg = Backbone.View.extend({
 
     		var nearest = tree.nearest(point.toJSON(), 1);
             var nearestNamedPoint = nearest[0][0];
-            var nearestDistance = nearest[0][1];
 
-            //Distance must be less than 100 for now
-            if(nearestDistance > 100) {
+            var polygon = polygons.findWhere({id: nearestNamedPoint.id});
+
+            if(polygon.inPolygon(point)) {
                 App.vent.trigger("point_info", {
-                    distance:nearestDistance.toFixed(2),
-                    id: "",
+                    id: nearestNamedPoint.id,
                     top: event.clientY,
                     left:event.clientX
-                });
+                });            
             } else {
-                //Put information about NamedIndividual on page
-                App.vent.trigger("point_info", {   
-                        distance: nearestDistance.toFixed(2),
-                        id: nearestNamedPoint.id,
-                        top: event.clientY,
-                        left:event.clientX
-                    });
+                App.vent.trigger("hide_infos");
             }
     	}
     },
@@ -106,6 +104,8 @@ App.Views.Svg = Backbone.View.extend({
     }
 });
 
+//View for controlling GATE server status and showing it to the user
+//Changes automatically depending on the model status
 App.Views.ServerStatus = Backbone.View.extend({
     el: "#server_status", 
 
@@ -130,6 +130,8 @@ App.Views.ServerStatus = Backbone.View.extend({
     }
 });
 
+//View for Language selection
+//Delegates language change to the model
 App.Views.Language = Backbone.View.extend({
     el: "#language_select",
 
@@ -147,6 +149,8 @@ App.Views.Language = Backbone.View.extend({
     }
 })
 
+//View for the button that toggles point markers
+//Registers clicked event and sends it to Event Aggregator
 App.Views.AllPointsButton = Backbone.View.extend({
     el: "#all_points",
 
@@ -160,6 +164,8 @@ App.Views.AllPointsButton = Backbone.View.extend({
     }
 });
 
+// View for Point markers, toggle is the main method to use
+// When markers are shown a new span is created as a little lime point in the center of the object
 App.Views.PointMarkers = Backbone.View.extend({
     visible: false,
 

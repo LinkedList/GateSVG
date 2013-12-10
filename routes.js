@@ -64,6 +64,7 @@ module.exports = function (app) {
 		}
 
 		var path = '/svg/get-annotation/' + session_id;
+		//ar path = '/svg/get-annotation/' + req.session_id;
 
 		console.log("Getting annotation..");
 		console.log("Session_id: " + session_id);

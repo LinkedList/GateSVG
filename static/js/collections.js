@@ -8,3 +8,7 @@ App.Collections.Points = Backbone.Collection.extend({
 App.Collections.NamedIndividuals = Backbone.Collection.extend({
 		model: App.Models.NamedIndividual
 });
+
+App.Collections.Polygons = Backbone.Collection.extend({
+	model: App.Models.Polygon
+});

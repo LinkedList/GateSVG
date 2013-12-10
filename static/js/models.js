@@ -1,8 +1,33 @@
 window.App = window.App || {};
 App.Models = App.Models || {};
 
+App.Models.Polygon = Backbone.Model.extend({
+    inPolygon: function (point) {
+        if(typeof point.get("x") === undefined || typeof point.get("y") === undefined) {
+            return false;
+        }
+        var points = this.get("points");
 
-//Point model
+        var i, j, nvert = points.length;
+        var result = false;
+
+        for(i = 0, j = nvert - 1; i < nvert; j = i++) {
+            if( 
+                ( (points[i].y) >= point.get("y") != (points[j].y >= point.get("y"))) && 
+                ( point.get("x") <= (points[j].x - points[i].x) * (point.get("y") - points[i].y) / (points[j].y - points[i].y) + points[i].x)
+              ) {
+                result = !result;
+            }
+        }
+
+        return result;
+    }
+});
+
+
+// Model for points parsed from svg
+// As infromation about the center point is in percent of the image size, 
+// method recalculate is for calculating a pixel position of the center point
 App.Models.Point = Backbone.Model.extend({
 
         recalculate: function (image_size_width, image_size_height) {
@@ -11,9 +36,11 @@ App.Models.Point = Backbone.Model.extend({
         }
 });
 
+//Language selection model
+//Listens to change and creates a request to the server for changing language
 App.Models.Language = Backbone.Model.extend({
 
-    initialize: function (model) {
+    initialize: function () {
         this.bind("change", this.change, this);
     },
 
@@ -26,10 +53,12 @@ App.Models.Language = Backbone.Model.extend({
             if(data.error) {
                 console.log("Error setting language: " + error);
             }
+            App.vent.trigger("language_change");
         });
     }
 });
 
+//Server status model
 App.Models.ServerStatus = Backbone.Model.extend({
 
     initialize: function () {
@@ -54,7 +83,8 @@ App.Models.ServerStatus = Backbone.Model.extend({
 App.Models.NamedIndividual = Backbone.Model.extend({});
 
 
-//Svg model
+//Main SVG Model
+//TODO structure code a bit more
 App.Models.Svg = Backbone.Model.extend({
 
 	//initialize for Svg model - donwloading of Svg happens here
@@ -124,6 +154,27 @@ App.Models.Svg = Backbone.Model.extend({
                 //Create new kdTree
                 tree = new kdTree(points.toJSON(), distance, ["x", "y"] );
 
+                //create polygons
+                polygons = new App.Collections.Polygons();
+                $(xml).find("polygon").each(function () {
+                    var polygon = {
+                        id: $(this).attr("id")
+                    }
+
+                    var points = $(this).attr("points").split(" ");
+                    points = _.map(points, function(point) {
+                        var coordinates = point.split(",");
+                        return {
+                            x: parseFloat(coordinates[0]),
+                            y: parseFloat(coordinates[1])
+                        };
+                    });
+
+                    polygon.points = points;
+                    polygons.add(new App.Models.Polygon(polygon));
+                });
+
+
                 //fire svgLoadDone event
                 thisSvg.trigger('svgLoadDone');
             }
@@ -131,6 +182,8 @@ App.Models.Svg = Backbone.Model.extend({
     }
 });
 
+
+//Main Point info model responsible for fetching information of the point from server
 App.Models.PointInfo = Backbone.Model.extend({
     fetchLabel: function () {
         var _this = this;
@@ -169,6 +222,8 @@ App.Models.PointInfo = Backbone.Model.extend({
     },
 
     fetchInfo: function () {
+        //Due to server limitation, we cannot create asynchronous requests, so every info request must
+        //be created only after the previous one is done
         var labelDone = this.fetchLabel();
         labelDone.promise().done($.proxy(function () {
             var classesDone = this.fetchClasses();
@@ -176,9 +231,4 @@ App.Models.PointInfo = Backbone.Model.extend({
             classesDone.promise().done($.proxy(this.fetchPositionInfo, this));
         }, this));
     }
-
-
-});
-
-App.Models.OntologyInfo = Backbone.Model.extend({
 });

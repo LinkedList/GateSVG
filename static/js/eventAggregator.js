@@ -4,10 +4,8 @@ App.vent = _.extend({}, Backbone.Events);
 App.openedInfos = [];
 App.openedInfosIds = [];
 
-App.vent.on("point_info", function (data) {	
-	_.each( App.openedInfos, function (opened) {
-		opened.hide();
-	});
+App.vent.on("point_info", function (data) {
+	hide_infos();
 
 	if($.inArray(data.id, App.openedInfosIds) === -1) {
 		var info = new App.Views.PointInfo({
@@ -42,3 +40,23 @@ App.vent.on("point_link", function (data) {
 App.vent.on("all_points", function () {
 	App.pointMarkersView.toggle();
 });
+
+App.vent.on("language_change", function (data) {
+	_.each( App.openedInfos, function (opened) {
+		opened.close();
+	});
+
+	//empty opened infos
+	App.openedInfos.length = 0;
+	App.openedInfosIds.length = 0;
+});
+
+App.vent.on("hide_infos", function () {
+	hide_infos();
+});
+
+function hide_infos() {
+	_.each( App.openedInfos, function (opened) {
+		opened.hide();
+	});
+}
