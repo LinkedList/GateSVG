@@ -82,14 +82,14 @@ App.Views.Svg = Backbone.View.extend({
     	if(event.target.nodeName == "image") {
     		var point = new App.Models.Point({x:event.offsetX, y:event.offsetY});
 
-    		var nearest = tree.nearest(point.toJSON(), 1);
-            var nearestNamedPoint = nearest[0][0];
+    		var nearest = tree.nearest(point.toJSON());
+            console.log(nearest);
 
-            var polygon = polygons.findWhere({id: nearestNamedPoint.id});
+            var polygon = polygons.findWhere({id: nearest.point.id});
 
             if(polygon.inPolygon(point)) {
                 App.vent.trigger("point_info", {
-                    id: nearestNamedPoint.id,
+                    id: nearest.point.id,
                     top: event.clientY,
                     left:event.clientX
                 });            

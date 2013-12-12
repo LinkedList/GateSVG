@@ -152,7 +152,7 @@ App.Models.Svg = Backbone.Model.extend({
                 });
 
                 //Create new kdTree
-                tree = new kdTree(points.toJSON(), distance, ["x", "y"] );
+                tree = new KDTree(points.toJSON(), ["x", "y"] );
 
                 //create polygons
                 polygons = new App.Collections.Polygons();
