@@ -2,7 +2,6 @@ var request = require('request');
 var http = require('http');
 
 module.exports = function (app) {
-	var session_id = "9b4ba7b9-901f-4a0a-8236-44d7c9be5dec";
 
 	var HTTP_200_OK = 200;
 	var HTTP_400_BAD_REQUEST = 400;
@@ -58,16 +57,15 @@ module.exports = function (app) {
 	});
 
 	app.get('/annotation', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = '/svg/get-annotation/' + session_id;
-		//ar path = '/svg/get-annotation/' + req.session_id;
+		var path = '/svg/get-annotation/' + req.body.session_id;
 
 		console.log("Getting annotation..");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
 				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
@@ -84,15 +82,15 @@ module.exports = function (app) {
 	});
 
 	app.get('/svg', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = '/svg/get/' + session_id;
+		var path = '/svg/get/' + req.body.session_id;
 
 		console.log("Getting svg..");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
@@ -110,15 +108,15 @@ module.exports = function (app) {
 	});
 
 	app.post('/close', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
 
-		var path = "/svg/close/" + session_id;
+		var path = "/svg/close/" + req.body.session_id;
 
 		console.log("Closing session.. ");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 
 		request.post(gate_server + path, function (error, response, body) {
 			if(error) {
@@ -137,7 +135,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/language', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -147,10 +145,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/set-language/" + session_id + "?lang=" + req.body.language;
+		var path = "/owl/set-language/" + req.body.session_id + "?lang=" + req.body.language;
 
 		console.log("Setting language..");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 		console.log("Language: " + req.body.language);
 
 		request(gate_server + path, function (error, response, body) {
@@ -169,7 +167,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/identify', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -179,10 +177,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/identify-subject/" + session_id + "?subjectName=" + req.body.subjectName;
+		var path = "/owl/identify-subject/" + req.body.session_id + "?subjectName=" + req.body.subjectName;
 
 		console.log("Identifying subject..");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 		console.log("SubjectName: " + req.body.subjectName);
 
 		request(gate_server + path, function (error, response, body) {
@@ -202,7 +200,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/simple', function (req, res) {
-		if(typeof session_id === "undefined") {
+		if(typeof req.body.session_id === "undefined") {
 			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
 			return;
 		}
@@ -217,10 +215,10 @@ module.exports = function (app) {
 			return;
 		}
 
-		var path = "/owl/query-subject/simple/" + session_id + "?uri=" + req.body.uri + "&lod=" + req.body.lod;
+		var path = "/owl/query-subject/simple/" + req.body.session_id + "?uri=" + req.body.uri + "&lod=" + req.body.lod;
 
 		console.log("Querying simple..");
-		console.log("Session_id: " + session_id);
+		console.log("SessionID: " + req.body.session_id);
 		console.log("Uri: " + req.body.uri);
 		console.log("Lod: " + req.body.lod);
 
@@ -237,6 +235,132 @@ module.exports = function (app) {
 
 			res.json(clean_response(body, req.body.lod));
 		});
+	});
+
+	app.post('/interval', function (req, res) {
+		if(typeof req.body.session_id === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
+			return;
+		}
+
+		if(typeof req.body.uri === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify uri"});
+			return;
+		}
+
+		if(typeof req.body.from === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify from"});
+			return;
+		}
+
+		if(typeof req.body.to === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify to"});
+			return;
+		}
+
+		var path = "/owl/query-subject/interval/" + req.body.session_id + "?uri=" + req.body.uri + "&from=" + req.body.from + "&to=" + req.body.to;
+
+		console.log("Querying interval..");
+		console.log("SessionID: " + req.body.session_id);
+		console.log("Uri: " + req.body.uri);
+		console.log("From: " + req.body.from);
+		console.log("To: " + req.body.to);
+
+		request(gate_server + path, function (error, response, body) {
+			if(error) {
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
+				return;
+			}
+
+			res.json(clean_response(body, req.body.lod));
+		});
+	});
+
+	app.post('/list', function (req, res) {
+		if(typeof req.body.session_id === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
+			return;
+		}
+
+		if(typeof req.body.id === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify id"});
+			return;
+		}
+
+		if(typeof req.body.list === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify from"});
+			return;
+		}
+
+		var path = "/owl/query-subject/list/" + req.body.session_id + "?id=" + req.body.id + "&list=" + req.body.list;
+
+		console.log("Querying interval..");
+		console.log("SessionID: " + req.body.session_id);
+		console.log("Id: " + req.body.id);
+		console.log("List: " + req.body.list);
+
+		request(gate_server + path, function (error, response, body) {
+			if(error) {
+				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+				return;
+			}
+
+			if(response.statusCode !== HTTP_200_OK) {
+				res.send(body);
+				return;
+			}
+
+			res.json(clean_response(body, req.body.lod));
+		});
+	});
+
+	app.post('/dialogue', function (req, res) {
+		if(typeof req.body.session_id === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify session"});
+			return;
+		}
+
+		if(typeof req.body.uri === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify uri"});
+			return;
+		}
+
+		if(typeof req.body.query === "undefined") {
+			res.json(HTTP_400_BAD_REQUEST, {error: "Must specify query"});
+			return;
+		}
+
+		var path = "/owl/query-subject/dialogue/" + req.body.session_id + "?query=" + req.body.query;
+
+		console.log("Querying dialogue..");
+		console.log("SessionID: " + req.body.session_id);
+		console.log("Query: " + req.body.query);
+
+		//Temporary solution:
+		res.json({
+			response: "Feature not yet implemented.."
+		});
+
+		// Not yet implemented on server
+		// request(gate_server + path, function (error, response, body) {
+		// 	if(error) {
+		// 		res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
+		// 		return;
+		// 	}
+
+		// 	if(response.statusCode !== HTTP_200_OK) {
+		// 		res.send(body);
+		// 		return;
+		// 	}
+
+		// 	//Assumed response will need cleaning
+		// 	res.json(clean_response(body, req.body.lod));
+		// });
 	});
 
 

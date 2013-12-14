@@ -11,7 +11,9 @@ App.Views.PointInfo = Backbone.View.extend({
 
     events: {
         "click .close": "hide",
-        "click .point-link": "pointLink"
+        "click .point-link": "pointLink",
+        "click .send": "send",
+        "submit form": "send"
     },
 
     initialize: function () {
@@ -55,6 +57,14 @@ App.Views.PointInfo = Backbone.View.extend({
 
     show: function () {
         this.$el.show();
+    },
+
+    send: function (event) {
+        event.preventDefault();
+        var query = this.$el.find(".query").val();
+        if(query.length > 0) {
+            this.model.query(query);    
+        }
     }
 });
 

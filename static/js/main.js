@@ -36,7 +36,8 @@
         //     console.log(App.session_id);
         // });
 
-        //create initializing view to indicate uploading and getting session_id
+        //Temporary solution to server limitations
+        App.session_id = "9b4ba7b9-901f-4a0a-8236-44d7c9be5dec";
 
         //initialize language after the upload is done -- TODO
         App.language = new App.Models.Language();
@@ -49,18 +50,18 @@
     })
     
     //close server session before quiting
-    $(window).unload(function () {
-        if(typeof App.session_id !== "undefined") {
-            $.ajax({
-                type: "POST", 
-                async: false,
-                url: "/close",
-                data: {
-                    session_id: App.session_id    
-                }
-            })
-            return "Closed session.";
-        }
-    })
+    // $(window).unload(function () {
+    //     if(typeof App.session_id !== "undefined") {
+    //         $.ajax({
+    //             type: "POST", 
+    //             async: false,
+    //             url: "/close",
+    //             data: {
+    //                 session_id: App.session_id    
+    //             }
+    //         })
+    //         return "Closed session.";
+    //     }
+    // });
     
 })();

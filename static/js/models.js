@@ -48,6 +48,7 @@ App.Models.Language = Backbone.Model.extend({
         var _this = this;
         //language change
         $.post('/language', {
+            session_id: App.session_id,
             language: _this.get("language")
         }, function (data) {
             if(data.error) {
@@ -189,6 +190,7 @@ App.Models.PointInfo = Backbone.Model.extend({
         var _this = this;
         if(this.get("id") !== "") {
             return $.post("/simple", {
+                session_id: App.session_id,
                 uri: this.get("id"),
                 lod: 1
             }, function (data) {
@@ -201,6 +203,7 @@ App.Models.PointInfo = Backbone.Model.extend({
         var _this = this;
         if(this.get("id") !== "") {
             return $.post("/simple", {
+                session_id: App.session_id,
                 uri: this.get("id"), 
                 lod: 4
             }, function (data) {
@@ -213,6 +216,7 @@ App.Models.PointInfo = Backbone.Model.extend({
         var _this = this;
         if(this.get("id") !== "") {
             return $.post("/simple", {
+                session_id: App.session_id,
                 uri: this.get("id"),
                 lod: 7
             }, function (data) {
@@ -230,5 +234,19 @@ App.Models.PointInfo = Backbone.Model.extend({
 
             classesDone.promise().done($.proxy(this.fetchPositionInfo, this));
         }, this));
+    },
+
+    query: function (term) {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/dialogue", {
+                session_id: App.session_id,
+                uri: this.get("id"), 
+                query: term
+            }, function (data) {
+                _this.set("response", data.response);
+            });
+        }
+        
     }
 });

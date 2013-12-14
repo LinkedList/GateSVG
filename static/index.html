@@ -21,53 +21,60 @@
 
     <script id="pointInfoTemplate" type="text/template">
         <a class="close" href="#"><i class="icon-remove"></i></a>
-        <% if(typeof label === "undefined") {
-          %> <div style="font-weight: bold">Loading...</div> <%
-        } else {
-          %> <h4><%= label %></h4> <%
-        }
-        %>
+        <% if(typeof label === "undefined") { %> 
+          <div style="font-weight: bold">Loading...</div> 
+        <% } else { %> 
+          <h4><%= label %></h4> 
+        <% } %>
 
 
-        <% if(typeof classes === "undefined") {
-          %> <div style="font-weight: bold">Loading...</div> <%
-        } else {
-          %> <div style="font-weight: bold"> Classes: <%
-          _.each(classes, function (class_name) {
-            %> <%= class_name %>,  <%
-          }); 
-          %> </div> <%
-        }
-        %>
+        <% if(typeof classes === "undefined") { %> 
+          <div style="font-weight: bold">Loading...</div> 
+        <% } else { %> 
+          <div style="font-weight: bold"> Classes: 
+          <% _.each(classes, function (class_name) { %> 
+            <%= class_name %>,  
+          <% }); %> 
+          </div> 
+        <% } %>
 
         <br />
 
-        <% if(typeof position === "undefined") {
-          %> <div style="font-weight: bold">Loading...</div> <%
-        } else {
-          %> <ul> <%
-          _.each(_.keys(position), function (key) {
-              %> <li><span style="font-weight: bold"><%= key %></span>: <%
-              if(!Array.isArray(position[key])) {
-                if(_.contains(points_only_names, position[key].toLowerCase())) {
-                  %><a href="#" class="point-link"><%= position[key] %></a></li> <%
-                } else {
-                  %> <%= position[key] %> </li> <%
-                }
+        <% if(typeof position === "undefined") { %> 
+          <div style="font-weight: bold">Loading...</div> 
+        <% } else { %> 
+          <ul> 
+          <% _.each(_.keys(position), function (key) { %> 
+            <li><span style="font-weight: bold"><%= key %></span>: 
+            <% if(!Array.isArray(position[key])) {
+                if(_.contains(points_only_names, position[key].toLowerCase())) { %>
+                  <a href="#" class="point-link"><%= position[key] %></a></li> 
+                <% } else { %> 
+                  <%= position[key] %> </li> 
+                <% }
               } else {
                 _.each(position[key], function (position_info) {
-                  if(_.contains(points_only_names, position_info.toLowerCase())) {
-                    %><a href="#" class="point-link"><%= position_info %></a>, <%
-                  } else {
-                    %> <%= position_info %>, <%
-                  }
-                })
-                %> </li> <%
-              }
-            });
-          %> </ul> <%
-        }
-        %>
+                  if(_.contains(points_only_names, position_info.toLowerCase())) { %>
+                    <a href="#" class="point-link"><%= position_info %></a>, 
+                    <% } else { %> 
+                      <%= position_info %>, 
+                    <% }
+                }) %> 
+                </li> 
+              <% }
+            }); %> 
+          </ul> 
+        <% } %>
+        <form class="form form-inline">
+          <input class="query" type="text" placeholder="Type your query please.." />
+          <a class="btn send" href="#" ><i class="icon-arrow-right"></i></a>
+        </form>
+
+        <% if(typeof response !== "undefined") { %>
+          <div><%= response %></div>
+        <% } %>
+
+
     </script>
   </head>
 
