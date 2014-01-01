@@ -49,6 +49,10 @@ App.vent.on("language_change", function (data) {
 	//empty opened infos
 	App.openedInfos.length = 0;
 	App.openedInfosIds.length = 0;
+
+	//Change header
+	header.unset("header");
+	header.fetchHeader();
 });
 
 App.vent.on("hide_infos", function () {

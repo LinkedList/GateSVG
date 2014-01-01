@@ -51,11 +51,8 @@ App.Models.Language = Backbone.Model.extend({
             session_id: App.session_id,
             language: _this.get("language")
         }, function (data) {
-            if(data.error) {
-                console.log("Error setting language: " + error);
-            }
             App.vent.trigger("language_change");
-        });
+        })
     }
 });
 
@@ -74,8 +71,10 @@ App.Models.ServerStatus = Backbone.Model.extend({
             if(typeof data.error !== "undefined") {
                 console.log("Error contacting server..");
                 _this.set("status", "NOK");
+                _this.set("label", "Server is not responding..");
             } else {
                 _this.set("status", "OK");
+                _this.set("label", "Server is responding..");
             }
         });
     }
@@ -120,12 +119,22 @@ App.Models.Svg = Backbone.Model.extend({
 
                         points.push(new App.Models.Point(object));
                     } else { 
-                        //is named individual with location point
+                        
                         $(this).children().each(function () {
                             var _this = $(this).context;
+
+                            //is named individual with location point
                             if(_this.nodeName === "go:hasLocationPoint") {
                                 object.locationPoint = $(this).attr("rdf:resource");
                                 namedIndividuals.push(new App.Models.NamedIndividual(object));
+                            }
+
+                            if(_this.nodeName === "go:hasGenre") {
+                                var genre = $(this).attr("rdf:resource").split("#")[1];
+                                if(genre === "photo") {
+                                    var photo_id = $(this).parent().attr("rdf:about");
+                                    header = new App.Models.HeaderInfo({id:photo_id});
+                                }
                             }
                         });
                     }
@@ -186,6 +195,10 @@ App.Models.Svg = Backbone.Model.extend({
 
 //Main Point info model responsible for fetching information of the point from server
 App.Models.PointInfo = Backbone.Model.extend({
+    initialize: function () {
+        this.set("num_info", INFO_STEP);
+    },
+
     fetchLabel: function () {
         var _this = this;
         if(this.get("id") !== "") {
@@ -248,5 +261,68 @@ App.Models.PointInfo = Backbone.Model.extend({
             });
         }
         
+    },
+
+    less: function () {
+        if(this.get("num_info") > 0) {
+            this.set("num_info", this.get("num_info") - INFO_STEP);
+        }
+
+        if(this.get("num_info") < 0) {
+            this.set("num_info", 0);
+        }
+    },
+
+    more: function () {
+        var position_length = _.keys(this.get("position")).length;
+        if(this.get("num_info") < position_length) {
+            this.set("num_info", this.get("num_info") + INFO_STEP);    
+        }
+
+        if(this.get("num_info") > position_length) {
+            this.set("num_info", position_length);
+        }
+    },
+
+    all: function () {
+        this.set("num_info", _.keys(this.get("position")).length);
+    },
+
+    reload: function () {
+        this.unset("response");
+        this.unset("position");
+        this.unset("classes");  
+        this.unset("label");
+        this.set("num_info", INFO_STEP);
+        this.fetchInfo();
     }
+
+});
+
+App.Models.HeaderInfo = Backbone.Model.extend({
+    fetchHeader: function() {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/simple", {
+                session_id: App.session_id,
+                uri: this.get("id"),
+                lod: 1
+            }, function (data) {
+                _this.set("header", data.label);
+            });
+        }
+    },
+
+    query: function (term) {
+        var _this = this;
+        if(this.get("id") !== "") {
+            return $.post("/dialogue", {
+                session_id: App.session_id,
+                uri: this.get("id"), 
+                query: term
+            }, function (data) {
+                _this.set("response", data.response);
+            });
+        }
+    },
 });

@@ -13,7 +13,11 @@ App.Views.PointInfo = Backbone.View.extend({
         "click .close": "hide",
         "click .point-link": "pointLink",
         "click .send": "send",
-        "submit form": "send"
+        "submit form": "send",
+        "click .more": "more",
+        "click .less": "less",
+        "click .all": "all",
+        "click .reload": "reload"
     },
 
     initialize: function () {
@@ -42,7 +46,6 @@ App.Views.PointInfo = Backbone.View.extend({
     },
 
     close: function (event) {
-        console.log(event);
         if(typeof event !== "undefined") {
             event.preventDefault();    
         }
@@ -65,6 +68,26 @@ App.Views.PointInfo = Backbone.View.extend({
         if(query.length > 0) {
             this.model.query(query);    
         }
+    }, 
+
+    less: function (event) {
+        event.preventDefault();
+        this.model.less();
+    },
+
+    more: function (event) {
+        event.preventDefault();
+        this.model.more();
+    },
+
+    all: function(event) {
+        event.preventDefault();
+        this.model.all();
+    },
+
+    reload: function (event) {
+        event.preventDefault();
+        this.model.reload();
     }
 });
 
@@ -93,7 +116,6 @@ App.Views.Svg = Backbone.View.extend({
     		var point = new App.Models.Point({x:event.offsetX, y:event.offsetY});
 
     		var nearest = tree.nearest(point.toJSON());
-            console.log(nearest);
 
             var polygon = polygons.findWhere({id: nearest.point.id});
 
@@ -121,21 +143,20 @@ App.Views.ServerStatus = Backbone.View.extend({
 
     initialize: function (model) {
         this.model = model;
-        this.model.bind("change", this.changed, this);
+        this.model.bind("change", this.render, this);
     },
 
-    changed: function () {
+    render: function () {
+            this.$el.html(this.model.get("label"));
+            this.badgeColor();
+    },
+
+    badgeColor: function () {
         var status = this.model.get("status");
         if(status === "NOK") {
-            this.$el.attr('title', "Server is not responding..");
-            this.$el.html("Server is not responding..");
-            this.$el.removeClass("badge-success");
-            this.$el.addClass("badge-important");
+            this.$el.removeClass("badge-success").addClass("badge-important");
         } else {
-            this.$el.attr('title', "Server is responding..");
-            this.$el.html("Server is responding..");
-            this.$el.removeClass("badge-important");
-            this.$el.addClass("badge-success");
+            this.$el.removeClass("badge-important").addClass("badge-success");
         }
     }
 });
@@ -216,13 +237,31 @@ App.Views.PointMarkers = Backbone.View.extend({
 App.Views.Header = Backbone.View.extend({
 	el: "#header",
 
+    events: {
+        "click .send": "send",
+        "submit form": "send"
+    },
+
 	initialize: function(model) {
 		this.model = model;
-		this.render();
+        this.model.fetchHeader();
+		this.model.bind("change", this.showLabel, this);
+        this.model.bind("change", this.showResponse, this);
 	},
 
-	render: function() {
-		this.$el.html(this.model.text);
-		return this;
-	}
+	showLabel: function () {
+        $(".svg-header").html(this.model.get("header"));
+    },
+
+    showResponse: function () {
+        $(".svg-response").html(this.model.get("response"));
+    },
+
+    send: function () {
+        event.preventDefault();
+        var query = this.$el.find(".svg-query").val();
+        if(query.length > 0) {
+            this.model.query(query);    
+        }    
+    }
 });

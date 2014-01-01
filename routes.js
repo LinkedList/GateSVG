@@ -153,12 +153,13 @@ module.exports = function (app) {
 
 		request(gate_server + path, function (error, response, body) {
 			if(error) {
+				console.log("Error: " + error);
 				res.json(HTTP_500_INTERNAL_SERVER_ERROR, error);
 				return;
 			}
 
 			if(response.statusCode !== HTTP_200_OK) {
-				res.send(body);
+				res.send(HTTP_500_INTERNAL_SERVER_ERROR, body);
 				return;
 			}
 

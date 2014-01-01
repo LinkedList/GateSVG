@@ -17,10 +17,31 @@
           padding: 5px;
           width: 300px;
         }
+
+        .reload {
+          float: right;
+          font-size: 20px;
+          font-weight: bold;
+          line-height: 20px;
+          color: #000000;
+          text-shadow: 0 1px 0 #ffffff;
+          opacity: 0.2;
+          filter: alpha(opacity=20);
+        }
+
+        .reload:hover,
+        .reload:focus {
+          color: #000000;
+          text-decoration: none;
+          cursor: pointer;
+          opacity: 0.4;
+          filter: alpha(opacity=40);
+        }
     </style>
 
     <script id="pointInfoTemplate" type="text/template">
         <a class="close" href="#"><i class="icon-remove"></i></a>
+        <a class="reload" href="#"><i class="icon-refresh"></i></a>
         <% if(typeof label === "undefined") { %> 
           <div style="font-weight: bold">Loading...</div> 
         <% } else { %> 
@@ -43,8 +64,10 @@
         <% if(typeof position === "undefined") { %> 
           <div style="font-weight: bold">Loading...</div> 
         <% } else { %> 
-          <ul> 
-          <% _.each(_.keys(position), function (key) { %> 
+          <ul>
+          <% var i = num_info %>
+          <% _.some(_.keys(position), function (key) { %>
+            <% if(i <= 0) return true; %>
             <li><span style="font-weight: bold"><%= key %></span>: 
             <% if(!Array.isArray(position[key])) {
                 if(_.contains(points_only_names, position[key].toLowerCase())) { %>
@@ -62,8 +85,15 @@
                 }) %> 
                 </li> 
               <% }
-            }); %> 
-          </ul> 
+              i--;
+            }); %>
+          </ul>
+          <div class="text-center">
+            <a class="btn less" href="#"><i class="icon-minus"></i></a>
+            <a class="btn more" href="#"><i class="icon-plus"></i></a>
+            <a class="btn btn-mini all" href="#"><i class="icon-plus"></i><i class="icon-plus"></i></a>
+          </div>
+          <br />
         <% } %>
         <form class="form form-inline">
           <input class="query" type="text" placeholder="Type your query please.." />
@@ -83,7 +113,6 @@
       <div class="navbar-inner">
         <div class="container">
           <a class="brand" href="#">Gate SVG</a>
-          <div id="header" class="brand"></div>
           <a href="#" id="all_points" class="btn pull-left">Toggle all points</a>
           <div class="navbar-search pull-right">
             Server status:
@@ -101,6 +130,15 @@
     </div>
     <div class="container">
         <div id="svg"></div>
+        <div id="header">
+          <h4 class="svg-header"></h4>
+          <form class="form form-inline">
+            <input class="svg-query" type="text" placeholder="Type your query please.." />
+            <a class="btn send" href="#" ><i class="icon-arrow-right"></i></a>
+            <span class="svg-response"></span>
+          </form>
+          
+        </div>
     </div>    
 
     <script src="js/KDTree.js"></script>

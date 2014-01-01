@@ -5,10 +5,7 @@ var baseUrl = "/images/";
 var tree;
 var points;
 var points_only_names;
-
 var polygons;
+var header;
 
-//Distance function for tree
-var distance = function(a, b){
-    return Math.sqrt(Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2));
-}
+var INFO_STEP = 5;

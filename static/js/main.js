@@ -37,15 +37,17 @@
         // });
 
         //Temporary solution to server limitations
-        App.session_id = "9b4ba7b9-901f-4a0a-8236-44d7c9be5dec";
+        App.session_id = "ae3c84c4-5af3-4461-890f-a0f72615937b";
 
-        //initialize language after the upload is done -- TODO
+        //initialize language after the upload is done
         App.language = new App.Models.Language();
         App.languageView = new App.Views.Language(App.language);
-        App.language.set("language", "en");
+        //App.language.set("language", "en");
 
         App.allPointsButtonView = new App.Views.AllPointsButton();
         App.pointMarkersView = new App.Views.PointMarkers({collection: points});
+
+        App.headerView = new App.Views.Header(header);
 
     })
     
